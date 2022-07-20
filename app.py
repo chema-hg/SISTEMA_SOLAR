@@ -23,9 +23,12 @@ pygame.display.set_caption("Simulación del Sistema Solar")
 # Color de relleno del fondo de la pantalla
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
+BLUE = (100, 149, 237)
+RED = (188, 39, 50)
+DARK_GREY = (80, 78, 81)
 
 # RADIOS de los planetas en KILOMETROS
-RADIO_SOL = 695_700
+RADIO_SOL = 696_340
 RADIO_MERCURIO = 2_439.7
 RADIO_VENUS = 6_051.8
 RADIO_TIERRA = 6_371
@@ -35,11 +38,22 @@ RADIO_SATURNO = 58_232
 RADIO_URANO = 25_362
 RADIO_NEPTUNO = 24_622
 RADIO_PLUTON = 1_188.3
-# Se aumenta o disminuye el valor cambiando el valor del numerador en R_ESCALA
-R_ESCALA = 50 / 695_700
+
 
 # MASAS de los planetas en KILOGRAMOS
 M_SOL = 1.989e30
+M_MERCURIO = 3.285e23
+M_VENUS = 4.867e24
+M_TIERRA = 5.972e24
+M_MARTE = 6.39e23
+M_JUPITER = 1.898e27
+M_SATURNO = 5.683e26
+M_URANO = 8.681e25
+M_NEPTUNO = 1.024e26
+
+# Para hacer los planetas más grandes o pequeños en relación a la tierra establecemos
+# la variable tamano que es tamaño representado de la tierra.
+TAMANO = 16
 
 
 # Para construir los planetas vamos a utilizar la clase Planet()
@@ -64,7 +78,8 @@ class Planet:
     SCALE = 250 / AU
     # Cada vez que actualice los frames o la pantalla, cuanto tiempo ha pasado en la realidad
     # Vamos a establecerlo en un dia terrestre pero en en SEGUNDOS.
-    TIMESTEP = 3600 * 24 
+    TIMESTEP = 3600 * 24
+    
     
     def __init__(self, x, y, radius, color, mass):
         self.x = x
@@ -110,10 +125,23 @@ def main():
     # Lista de los planetas.
     
     # La masa de los planetas esta en KILOGRAMOS.
-    sun = Planet(0, 0, RADIO_SOL * R_ESCALA, YELLOW, M_SOL)
+    # El tamaño del sol no es real porque sino se nos saldria del grafico
+    # y no se verian los otros planetas.
+    sun = Planet(0, 0, TAMANO * 2, YELLOW, M_SOL)
     sun.sun = True
     
-    planets = [sun]
+    mercury = Planet(-0.387 * Planet.AU, 0, TAMANO * 0.4, DARK_GREY, M_MERCURIO)
+    venus = Planet(-0.723 * Planet.AU, 0, TAMANO * 0.9, WHITE, M_VENUS)
+    earth = Planet(-1 * Planet.AU, 0, TAMANO, BLUE, M_TIERRA)
+    mars = Planet(-1.524 * Planet.AU, 0, TAMANO * 0.5, RED, M_MARTE)
+    # jupiter = Planet(-5.20 * Planet.AU, 0, TAMANO * 11.20, BLUE, M_JUPITER)
+    # saturn = Planet(-9.54 * Planet.AU, 0, TAMANO * 9.5, BLUE, M_SATURNO)
+    
+    
+    
+    
+    
+    planets = [sun, mercury, venus, earth, mars]
     
     while run:
         # número máximo de veces que se actualizará la pantalla por segundo (frame rate maximo)
@@ -121,7 +149,7 @@ def main():
         clock.tick(60)
         # Rellena el fondo de la pantalla con el color que le pasemos como argumento
         # No se mostrara mientras no se actualice la pantalla.
-        WIN.fill(WHITE)
+        # WIN.fill(WHITE)
         # Actualiza la pantalla. Los objetos que hayamos puesto se mostrarán en la misma.
                 
         for event in pygame.event.get():
