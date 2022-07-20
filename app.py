@@ -7,7 +7,7 @@ de partida. '''
 import pygame
 # Importamos la libreria para los calculos matematicos
 import math
-# Iniciamos la aplicaión..
+# Iniciamos la aplicación..
 pygame.init()
 
 # Definimos el tamaño de la ventana que contendra la simulación
@@ -19,8 +19,27 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 # Ponemos el nombre de la ventana.
 pygame.display.set_caption("Simulación del Sistema Solar")
 
+# COLORES.
 # Color de relleno del fondo de la pantalla
 WHITE = (255, 255, 255)
+YELLOW = (255, 255, 0)
+
+# RADIOS de los planetas en KILOMETROS
+RADIO_SOL = 695_700
+RADIO_MERCURIO = 2_439.7
+RADIO_VENUS = 6_051.8
+RADIO_TIERRA = 6_371
+RADIO_MARTE = 3_389.5
+RADIO_JUPITER = 69_911
+RADIO_SATURNO = 58_232
+RADIO_URANO = 25_362
+RADIO_NEPTUNO = 24_622
+RADIO_PLUTON = 1_188.3
+# Se aumenta o disminuye el valor cambiando el valor del numerador en R_ESCALA
+R_ESCALA = 50 / 695_700
+
+# MASAS de los planetas en KILOGRAMOS
+M_SOL = 1.989e30
 
 
 # Para construir los planetas vamos a utilizar la clase Planet()
@@ -58,6 +77,7 @@ class Planet:
         # para poder dibujar su orbita.
         self.orbit = [] 
         # Nos dice si el planeta es el sol o no.
+        # El sol va a ser estatico y no se le aplicaran los calculos de las orbitas.
         self.sun = False
         # Distancia hasta el sol.
         self.distance_to_sun = 0
@@ -65,6 +85,18 @@ class Planet:
         # Velocidad en los ejes x e y
         self.x_vel = 0
         self.y_vel = 0
+        
+    def draw(self, win):
+        ''' Funcion para dibujar los planetas en la pantalla '''
+        # Las coordenadas espaciales hay que pasarlas a una escala para dibujarlas
+        # en la pantalla.
+        x = self.x * self.SCALE + WIDTH / 2
+        y = self.y * self.SCALE + HEIGHT / 2
+        # El punto (0,0) en pygame esta en la parte superior izquierda de la pantalla.
+        # Por esto tenemos que calcular el centro de la pantalla para desde ahi centrar los graficos.
+        # Por eso usamos + WIDTH/2 -> x e HEIGHT/2 -> y
+        pygame.draw.circle(win, self.color, (x, y), self.radius)
+        
 
 
 # La simulación del sistema solar se realiza en un bucle infinito.
@@ -75,6 +107,14 @@ def main():
     # ni muy despacio establecemos la variable clock
     clock = pygame.time.Clock()
     
+    # Lista de los planetas.
+    
+    # La masa de los planetas esta en KILOGRAMOS.
+    sun = Planet(0, 0, RADIO_SOL * R_ESCALA, YELLOW, M_SOL)
+    sun.sun = True
+    
+    planets = [sun]
+    
     while run:
         # número máximo de veces que se actualizará la pantalla por segundo (frame rate maximo)
         # Lo hacemos para asegurarnos de que el programa no vaya demasiado rapido.
@@ -83,13 +123,17 @@ def main():
         # No se mostrara mientras no se actualice la pantalla.
         WIN.fill(WHITE)
         # Actualiza la pantalla. Los objetos que hayamos puesto se mostrarán en la misma.
-        pygame.display.update()
-        
+                
         for event in pygame.event.get():
             # El unico evento que nos interesa registrar es cuando se
             # pulse en la esquina superior derecha la "x" para salir del programa.
             if event.type == pygame.QUIT:
                 run = False
+                
+        for planet in planets:
+            planet.draw(WIN)
+            
+        pygame.display.update()
     
     pygame.quit()
     
