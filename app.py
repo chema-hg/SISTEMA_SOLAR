@@ -11,7 +11,7 @@ import math
 pygame.init()
 
 # Definimos el tamaño de la ventana que contendra la simulación
-WIDTH, HEIGHT = 1200, 800 # 800 x 800
+WIDTH, HEIGHT = 1290, 700 # 800 x 800
 # Se dibuja el area donde se realizara la simulacion
 # En donde se dibujaran los planetas.
 # El objeto WIN nos servirá para dibujar objetos en la pantalla.
@@ -27,6 +27,8 @@ BLUE = (100, 149, 237)
 RED = (188, 39, 50)
 DARK_GREY = (80, 78, 81)
 BROWN = (80, 40, 0)
+
+FONT = pygame.font.SysFont("comicsans", 16)
 
 # RADIOS de los planetas en KILOMETROS
 RADIO_SOL = 696_340
@@ -55,7 +57,7 @@ M_PLUTON = 1e22
 
 # Para hacer los planetas más grandes o pequeños en relación a la tierra establecemos
 # la variable tamano que es tamaño representado de la tierra.
-TAMANO = 7 # 16
+TAMANO = 21 # 16
 
 
 # Para construir los planetas vamos a utilizar la clase Planet()
@@ -77,7 +79,7 @@ class Planet:
     # La escala sirve para ajustar las unidades astronomicas a nuestro grafico. No podemos dibujar
     # las distancias espaciales en nuestra pantalla. Por ello utilizamos la escala en la que aproximadamente
     # 100 pixeles equivale a una UNIDAD ASTRONOMICA.
-    SCALE = 90 / AU # 250 / AU
+    SCALE = 150 / AU # 250 / AU
     # Cada vez que actualice los frames o la pantalla, cuanto tiempo ha pasado en la realidad
     # Vamos a establecerlo en un dia terrestre pero en en SEGUNDOS.
     TIMESTEP = 3600 * 24
@@ -91,7 +93,7 @@ class Planet:
         self.mass = mass
         
         # Lista vacia para realizar un seguimiento de todos los puntos que sigue el planeta
-        # para poder dibujar su orbita.
+        # para poder dibujar su orbita posteriormente.
         self.orbit = [] 
         # Nos dice si el planeta es el sol o no.
         # El sol va a ser estatico y no se le aplicaran los calculos de las orbitas.
@@ -113,6 +115,22 @@ class Planet:
         # Por esto tenemos que calcular el centro de la pantalla para desde ahi centrar los graficos.
         # Por eso usamos + WIDTH/2 -> x e HEIGHT/2 -> y
         pygame.draw.circle(win, self.color, (x, y), self.radius)
+        
+        # Dibujar los puntos para señalar las orbitas de los planetas.
+        if len(self.orbit) > 2:
+            updated_points = []
+            for point in self.orbit:
+                x, y = point
+                x = x * self.SCALE + WIDTH / 2
+                y = y * self.SCALE + HEIGHT / 2
+                updated_points.append((x, y))
+        
+            pygame.draw.lines(win, self.color, False, updated_points, 2)
+            
+        # Texto para mostrar la distancia al sol de cada uno de los planetas.
+        if not self.sun:
+            distance_text = FONT.render(f"{round(self.distance_to_sun/1000, 1)} Km", 1, WHITE)
+            win.blit(distance_text, (x-distance_text.get_width()/2, y-distance_text.get_height()/2))
         
     def attraction(self, other):
         '''Calcula la fuerza de atracción del planeta con respecto a todos
